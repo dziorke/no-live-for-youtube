@@ -1,0 +1,7 @@
+dist/
+*.zip
+*.xpi
+.chrome-*-test-*/
+.chrome-*-dom-*/
+.DS_Store
+Thumbs.db

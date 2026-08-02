@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>No Live for YouTube</title>
+    <link rel="stylesheet" href="popup.css">
+  </head>
+  <body>
+    <main>
+      <div class="heading">
+        <div class="logo" aria-hidden="true">
+          <img src="assets/icons/icon48.png" alt="">
+        </div>
+        <div>
+          <h1>No Live</h1>
+          <p>for YouTube</p>
+        </div>
+      </div>
+
+      <label class="setting primary">
+        <span>
+          <strong>Block live streams</strong>
+          <small>Hide them across YouTube</small>
+        </span>
+        <input id="enabled" type="checkbox">
+        <span class="switch" aria-hidden="true"></span>
+      </label>
+
+      <div id="extra-settings">
+        <label class="setting">
+          <span>
+            <strong>Hide upcoming streams</strong>
+            <small>Also hide scheduled broadcasts</small>
+          </span>
+          <input id="hideUpcoming" type="checkbox">
+          <span class="switch" aria-hidden="true"></span>
+        </label>
+
+        <label class="setting">
+          <span>
+            <strong>Hide past live streams</strong>
+            <small>Block automatically uploaded recordings</small>
+          </span>
+          <input id="hidePastStreams" type="checkbox">
+          <span class="switch" aria-hidden="true"></span>
+        </label>
+
+        <label class="setting">
+          <span>
+            <strong>Skip during autoplay</strong>
+            <small>Automatically move to the next video</small>
+          </span>
+          <input id="skipAutoplay" type="checkbox">
+          <span class="switch" aria-hidden="true"></span>
+        </label>
+      </div>
+
+      <p id="saved" role="status" aria-live="polite">Settings saved</p>
+    </main>
+    <script src="popup.js"></script>
+  </body>
+</html>
