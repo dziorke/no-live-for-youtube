@@ -40,6 +40,30 @@ function Save-ResizedPng {
     }
 }
 
+function Save-ResizedImageFile {
+    param(
+        [string]$InputPath,
+        [int]$Width,
+        [int]$Height,
+        [string]$OutputPath
+    )
+    $input = [System.Drawing.Image]::FromFile($InputPath)
+    $output = New-ArgbBitmap -Width $Width -Height $Height
+    $graphics = [System.Drawing.Graphics]::FromImage($output)
+    try {
+        $graphics.CompositingQuality = [System.Drawing.Drawing2D.CompositingQuality]::HighQuality
+        $graphics.InterpolationMode = [System.Drawing.Drawing2D.InterpolationMode]::HighQualityBicubic
+        $graphics.SmoothingMode = [System.Drawing.Drawing2D.SmoothingMode]::HighQuality
+        $graphics.DrawImage($input, 0, 0, $Width, $Height)
+        $output.Save($OutputPath, [System.Drawing.Imaging.ImageFormat]::Png)
+    }
+    finally {
+        $graphics.Dispose()
+        $output.Dispose()
+        $input.Dispose()
+    }
+}
+
 function Remove-GreenScreen {
     param([string]$InputPath)
 
@@ -154,7 +178,8 @@ try {
         }
     }
 
-    New-StoreGraphic -Icon $transparent -Width 1280 -Height 800 -Path (Join-Path $StoreDirectory "screenshot-settings-1280x800.png") -Draw {
+    $settingsScreenshot = Join-Path $StoreDirectory "screenshot-settings-1280x800.png"
+    New-StoreGraphic -Icon $transparent -Width 1280 -Height 800 -Path $settingsScreenshot -Draw {
         param($graphics, $icon, $width, $height)
         $background = [System.Drawing.Drawing2D.LinearGradientBrush]::new(
             [System.Drawing.Point]::new(0, 0),
@@ -192,7 +217,8 @@ try {
         }
     }
 
-    New-StoreGraphic -Icon $transparent -Width 1280 -Height 800 -Path (Join-Path $StoreDirectory "screenshot-features-1280x800.png") -Draw {
+    $featuresScreenshot = Join-Path $StoreDirectory "screenshot-features-1280x800.png"
+    New-StoreGraphic -Icon $transparent -Width 1280 -Height 800 -Path $featuresScreenshot -Draw {
         param($graphics, $icon, $width, $height)
         $background = [System.Drawing.SolidBrush]::new([System.Drawing.Color]::FromArgb(16, 16, 22))
         $card = [System.Drawing.SolidBrush]::new([System.Drawing.Color]::FromArgb(37, 37, 47))
@@ -230,6 +256,11 @@ try {
             $title.Dispose(); $heading.Dispose(); $body.Dispose()
         }
     }
+
+    Save-ResizedImageFile -InputPath $settingsScreenshot -Width 800 -Height 500 `
+        -OutputPath (Join-Path $StoreDirectory "opera-screenshot-settings-800x500.png")
+    Save-ResizedImageFile -InputPath $featuresScreenshot -Width 800 -Height 500 `
+        -OutputPath (Join-Path $StoreDirectory "opera-screenshot-features-800x500.png")
 }
 finally {
     $transparent.Dispose()
