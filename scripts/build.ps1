@@ -3,6 +3,9 @@ param(
 )
 
 $ErrorActionPreference = "Stop"
+Add-Type -AssemblyName System.IO.Compression
+Add-Type -AssemblyName System.IO.Compression.FileSystem
+
 $projectRoot = (Resolve-Path (Join-Path $PSScriptRoot "..")).Path
 $manifestPath = Join-Path $projectRoot "manifest.json"
 $manifest = Get-Content -LiteralPath $manifestPath -Raw | ConvertFrom-Json
@@ -47,7 +50,41 @@ try {
     if (Test-Path -LiteralPath $chromiumPackage) { Remove-Item -LiteralPath $chromiumPackage -Force }
     if (Test-Path -LiteralPath $firefoxPackage) { Remove-Item -LiteralPath $firefoxPackage -Force }
 
-    Compress-Archive -Path (Join-Path $staging "*") -DestinationPath $chromiumPackage -CompressionLevel Optimal
+    $archive = [System.IO.Compression.ZipFile]::Open(
+        $chromiumPackage,
+        [System.IO.Compression.ZipArchiveMode]::Create
+    )
+    try {
+        foreach ($relativePath in $runtimeFiles) {
+            $sourcePath = Join-Path $staging $relativePath
+            $entryName = $relativePath.Replace("\", "/")
+            [System.IO.Compression.ZipFileExtensions]::CreateEntryFromFile(
+                $archive,
+                $sourcePath,
+                $entryName,
+                [System.IO.Compression.CompressionLevel]::Optimal
+            ) | Out-Null
+        }
+    }
+    finally {
+        $archive.Dispose()
+    }
+
+    $archive = [System.IO.Compression.ZipFile]::OpenRead($chromiumPackage)
+    try {
+        foreach ($entry in $archive.Entries) {
+            $entryName = $entry.FullName
+            if ($entryName.Contains("\") -or
+                $entryName.StartsWith("/") -or
+                $entryName -match '(^|/)\.\.(/|$)') {
+                throw "Package contains an unsafe or non-portable path: $entryName"
+            }
+        }
+    }
+    finally {
+        $archive.Dispose()
+    }
+
     Copy-Item -LiteralPath $chromiumPackage -Destination $firefoxPackage
 
     $checksumFile = Join-Path $OutputDirectory "SHA256SUMS.txt"
@@ -60,6 +97,7 @@ try {
 
     Write-Output "Built $chromiumPackage"
     Write-Output "Built $firefoxPackage"
+    Write-Output "Validated portable archive paths"
     Write-Output "Wrote $checksumFile"
 }
 finally {
