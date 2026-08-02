@@ -33,7 +33,10 @@
 ## Opera Add-ons
 
 - Upload the Chromium ZIP.
-- Reuse the listing copy, icon, and screenshots.
+- Reuse the listing copy and icon.
+- Upload `store-assets/opera-screenshot-settings-800x500.png` and
+  `store-assets/opera-screenshot-features-800x500.png`. These fit Opera's
+  maximum 800x600 screenshot dimensions.
 - Choose Productivity and the MIT license.
 - Include the testing notice in the description.
 - Provide the GitHub Issues URL as the support page.
