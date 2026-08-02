@@ -150,7 +150,7 @@ function New-StoreGraphic {
 $transparent = Remove-GreenScreen -InputPath $Source
 try {
     Save-ResizedPng -Image $transparent -Size 1024 -Path (Join-Path $IconDirectory "icon1024.png")
-    foreach ($size in 16, 32, 48, 128) {
+    foreach ($size in 16, 32, 48, 64, 128) {
         Save-ResizedPng -Image $transparent -Size $size -Path (Join-Path $IconDirectory "icon$size.png")
     }
 
