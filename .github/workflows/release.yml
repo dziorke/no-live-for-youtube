@@ -12,7 +12,7 @@ jobs:
   release:
     runs-on: windows-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - name: Verify tag and build packages
         shell: pwsh
         run: |
@@ -29,6 +29,6 @@ jobs:
           $tag = $env:GITHUB_REF_NAME
           gh release view $tag 2>$null
           if ($LASTEXITCODE -ne 0) {
-            gh release create $tag --title "No Live for YouTube $tag" --generate-notes
+            gh release create $tag --prerelease --title "No Live for YouTube $tag (Testing)" --generate-notes
           }
           gh release upload $tag dist\* --clobber
